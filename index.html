@@ -1,148 +1,164 @@
-<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+ <!DOCTYPE html>
   <meta charset="UTF-8">
   <title>تطبيق تحويل العملات الرقمية والعالمية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to left, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      direction: rtl;
-      text-align: right;
-    }
+    body 
+    const headers = {
+  'X-CMC_PRO_API_KEY': 'e0b8759c-9999-4358-865b-c06c74d799ac'
+};
 
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 20px;
-    }
+const url = '[https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest](https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest)';
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+fetch(url, { headers })
+.then(response => response.json())
+.then(data => console.log(data));
+e0b8759c-9999-4358-865b-c06c74d799ac add this api code to my html code <!DOCTYPE html>{
+margin: 0;
+font-family: 'Segoe UI', sans-serif;
+background: linear-gradient(to left, #0f2027, #203a43, #2c5364);
+color: #fff;
+direction: rtl;
+text-align: right;
+}
 
-    .exchange-box {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+```
+.container {
+  max-width: 960px;
+  margin: auto;
+  padding: 20px;
+}
 
-    select, input {
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      min-width: 180px;
-    }
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-    button {
-      padding: 10px 20px;
-      background: #00b894;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.exchange-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
 
-    button:hover {
-      background: #019875;
-    }
+select, input {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  min-width: 180px;
+}
 
-    #result {
-      text-align: center;
-      font-size: 1.2em;
-      margin: 10px 0;
-    }
+button {
+  padding: 10px 20px;
+  background: #00b894;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    canvas {
-      background: #fff;
-      border-radius: 10px;
-    }
+button:hover {
+  background: #019875;
+}
 
-    .theme-toggle {
-      text-align: center;
-      margin-bottom: 15px;
-    }
+#result {
+  text-align: center;
+  font-size: 1.2em;
+  margin: 10px 0;
+}
 
-    .theme-toggle button {
-      background: #636e72;
-    }
+canvas {
+  background: #fff;
+  border-radius: 10px;
+}
 
-    .dark-mode {
-      background: #121212;
-      color: #f1f1f1;
-    }
+.theme-toggle {
+  text-align: center;
+  margin-bottom: 15px;
+}
 
-    .dark-mode canvas {
-      background: #1e1e1e;
-    }
+.theme-toggle button {
+  background: #636e72;
+}
 
-    .loader {
-      text-align: center;
-      margin: 20px 0;
-    }
+.dark-mode {
+  background: #121212;
+  color: #f1f1f1;
+}
 
-    .search-bar {
-      margin-bottom: 15px;
-    }
+.dark-mode canvas {
+  background: #1e1e1e;
+}
 
-    .search-bar input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-    }
+.loader {
+  text-align: center;
+  margin: 20px 0;
+}
 
-    .coin-list {
-      max-height: 200px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
+.search-bar {
+  margin-bottom: 15px;
+}
 
-    .coin-list li {
-      padding: 5px;
-      cursor: pointer;
-    }
+.search-bar input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
 
-    .coin-list li:hover {
-      background-color: #2d3436;
-    }
+.coin-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.coin-list li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.coin-list li:hover {
+  background-color: #2d3436;
+}
+```
+
   </style>
 </head>
 <body>
   <div class="container">
     <h1>تطبيق تحويل العملات الرقمية والعالمية</h1>
 
-    <div class="theme-toggle">
-      <button onclick="toggleTheme()">🌓 تبديل الوضع الليلي / النهاري</button>
-    </div>
+```
+<div class="theme-toggle">
+  <button onclick="toggleTheme()">🌓 تبديل الوضع الليلي / النهاري</button>
+</div>
 
-    <div class="exchange-box">
-      <input type="number" id="amount" value="1" min="0.01" step="0.01">
-      <select id="from"></select>
-      <span>⇄</span>
-      <select id="to"></select>
-      <button onclick="convert()">تحويل</button>
-    </div>
+<div class="exchange-box">
+  <input type="number" id="amount" value="1" min="0.01" step="0.01">
+  <select id="from"></select>
+  <span>⇄</span>
+  <select id="to"></select>
+  <button onclick="convert()">تحويل</button>
+</div>
 
-    <div id="result">جاري تحميل العملات...</div>
+<div id="result">جاري تحميل العملات...</div>
 
-    <div class="search-bar">
-      <input type="text" id="coinSearch" placeholder="ابحث عن عملة" onkeyup="filterCoins()">
-    </div>
+<div class="search-bar">
+  <input type="text" id="coinSearch" placeholder="ابحث عن عملة" onkeyup="filterCoins()">
+</div>
 
-    <ul class="coin-list" id="coinList"></ul>
+<ul class="coin-list" id="coinList"></ul>
 
-    <canvas id="priceChart" height="100"></canvas>
+<canvas id="priceChart" height="100"></canvas>
 
-    <div class="loader" id="loading">⏳ يتم تحميل العملات...</div>
+<div class="loader" id="loading">⏳ يتم تحميل العملات...</div>
+```
+
   </div>
 
   <script>
@@ -329,5 +345,6 @@
 
     loadCoins();
   </script>
+
 </body>
-</html>
+</html>  
