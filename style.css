@@ -1,0 +1,108 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to left, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  direction: rtl;
+  text-align: right;
+}
+
+.container {
+  max-width: 960px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.exchange-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+select, input {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  min-width: 180px;
+}
+
+button {
+  padding: 10px 20px;
+  background: #00b894;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #019875;
+}
+
+#result {
+  text-align: center;
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+canvas {
+  background: #fff;
+  border-radius: 10px;
+}
+
+.theme-toggle {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.theme-toggle button {
+  background: #636e72;
+}
+
+.dark-mode {
+  background: #121212;
+  color: #f1f1f1;
+}
+
+.dark-mode canvas {
+  background: #1e1e1e;
+}
+
+.loader {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.search-bar {
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.coin-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.coin-list li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.coin-list li:hover {
+  background-color: #2d3436;
+}

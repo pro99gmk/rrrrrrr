@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تطبيق تحويل العملات الرقمية والعالمية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to left, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .exchange-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select, input {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      min-width: 180px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #00b894;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #019875;
+    }
+
+    #result {
+      text-align: center;
+      font-size: 1.2em;
+      margin: 10px 0;
+    }
+
+    canvas {
+      background: #fff;
+      border-radius: 10px;
+    }
+
+    .theme-toggle {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .theme-toggle button {
+      background: #636e72;
+    }
+
+    .dark-mode {
+      background: #121212;
+      color: #f1f1f1;
+    }
+
+    .dark-mode canvas {
+      background: #1e1e1e;
+    }
+
+    .loader {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .search-bar {
+      margin-bottom: 15px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .coin-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    .coin-list li {
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .coin-list li:hover {
+      background-color: #2d3436;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>تطبيق تحويل العملات الرقمية والعالمية</h1>
+
+    <div class="theme-toggle">
+      <button onclick="toggleTheme()">🌓 تبديل الوضع الليلي / النهاري</button>
+    </div>
+
+    <div class="exchange-box">
+      <input type="number" id="amount" value="1" min="0.01" step="0.01">
+      <select id="from"></select>
+      <span>⇄</span>
+      <select id="to"></select>
+      <button onclick="convert()">تحويل</button>
+    </div>
+
+    <div id="result">جاري تحميل العملات...</div>
+
+    <div class="search-bar">
+      <input type="text" id="coinSearch" placeholder="ابحث عن عملة" onkeyup="filterCoins()">
+    </div>
+
+    <ul class="coin-list" id="coinList"></ul>
+
+    <canvas id="priceChart" height="100"></canvas>
+
+    <div class="loader" id="loading">⏳ يتم تحميل العملات...</div>
+  </div>
+
+  <script>
+    const from = document.getElementById('from');
+    const to = document.getElementById('to');
+    const result = document.getElementById('result');
+    const loading = document.getElementById('loading');
+    const chartCtx = document.getElementById('priceChart').getContext('2d');
+    const coinSearch = document.getElementById('coinSearch');
+    const coinList = document.getElementById('coinList');
+
+    const fiatCurrencies = [
+      { id: 'usd', name: 'الدولار الأمريكي (USD)' },
+      { id: 'eur', name: 'اليورو (EUR)' },
+      { id: 'try', name: 'الليرة التركية (TRY)' },
+      { id: 'rub', name: 'الروبل الروسي (RUB)' },
+      { id: 'sar', name: 'الريال السعودي (SAR)' },
+      { id: 'aed', name: 'الدرهم الإماراتي (AED)' },
+      { id: 'egp', name: 'الجنيه المصري (EGP)' },
+    ];
+
+    let coinListData = [];
+    let chart;
+
+    const language = localStorage.getItem('language') || 'ar';
+
+    const translations = {
+      ar: {
+        title: 'تحويل العملات الرقمية والعالمية',
+        convert: 'تحويل',
+        resultText: 'جاري تحميل العملات...',
+        themeButton: '🌓 تبديل الوضع الليلي / النهاري',
+        chooseCurrencies: 'اختر العملات',
+      },
+      en: {
+        title: 'Digital and Fiat Currency Converter',
+        convert: 'Convert',
+        resultText: 'Loading currencies...',
+        themeButton: '🌞 Toggle Dark/Light Mode',
+        chooseCurrencies: 'Choose Currencies',
+      },
+    };
+
+    document.title = translations[language].title;
+
+    async function loadCoins() {
+      const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1');
+      const data = await res.json();
+
+      coinListData = data.map(coin => ({
+        id: coin.id,
+        name: `${coin.name} (${coin.symbol.toUpperCase()}) - القيمة السوقية: ${Math.round(coin.market_cap).toLocaleString()}$`
+      }));
+
+      populateCoinList();
+    }
+
+    function populateCoinList() {
+      const allOptions = [...coinListData, ...fiatCurrencies];
+
+      allOptions.forEach(opt => {
+        const opt1 = document.createElement('option');
+        opt1.value = opt.id;
+        opt1.textContent = opt.name;
+        const opt2 = opt1.cloneNode(true);
+        from.appendChild(opt1);
+        to.appendChild(opt2);
+      });
+
+      coinListData.forEach(coin => {
+        const li = document.createElement('li');
+        li.textContent = coin.name;
+        li.onclick = () => selectCoin(coin.id);
+        coinList.appendChild(li);
+      });
+
+      from.value = 'bitcoin';
+      detectUserCurrency();
+    }
+
+    function selectCoin(coinId) {
+      from.value = coinId;
+      to.value = 'usd';  // Set default conversion to USD for now
+      convert();
+    }
+
+    async function detectUserCurrency() {
+      try {
+        const response = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
+        const data = await response.json();
+        const countryCode = data.countryCode;
+        const currencyId = countryCurrencyMap[countryCode] || 'usd';
+        to.value = currencyId;
+        convert();
+      } catch (err) {
+        to.value = 'usd';
+        convert();
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    async function convert() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const fromCurrency = from.value;
+      const toCurrency = to.value;
+
+      if (fromCurrency === toCurrency) {
+        result.textContent = translations[language].chooseCurrencies;
+        return;
+      }
+
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${fromCurrency}&vs_currencies=${toCurrency}`);
+        const data = await res.json();
+
+        if (!data[fromCurrency] || !data[fromCurrency][toCurrency]) {
+          result.textContent = "تعذر التحويل حالياً.";
+          return;
+        }
+
+        const rate = data[fromCurrency][toCurrency];
+        const converted = amount * rate;
+
+        result.textContent = `${amount} ${fromCurrency.toUpperCase()} = ${converted.toFixed(4)} ${toCurrency.toUpperCase()}`;
+        loadChart(fromCurrency, toCurrency);
+      } catch (error) {
+        result.textContent = "فشل في الاتصال بالخادم.";
+      }
+    }
+
+    async function loadChart(coin, vsCurrency) {
+      const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coin}/market_chart?vs_currency=${vsCurrency}&days=1`);
+      const data = await res.json();
+
+      const labels = data.prices.map(p => new Date(p[0]).toLocaleTimeString(language === 'ar' ? 'ar-EG' : 'en-US'));
+      const prices = data.prices.map(p => p[1]);
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(chartCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: `سعر ${coin.toUpperCase()} مقابل ${vsCurrency.toUpperCase()}`,
+            data: prices,
+            borderColor: '#00cec9',
+            fill: true,
+            backgroundColor: 'rgba(0,206,201,0.1)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              ticks: { color: getComputedStyle(document.body).color }
+            },
+            y: {
+              ticks: { color: getComputedStyle(document.body).color }
+            }
+          }
+        }
+      });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      if (chart) chart.update();
+    }
+
+    function filterCoins() {
+      const searchText = coinSearch.value.toLowerCase();
+      const filteredCoins = coinListData.filter(coin => coin.name.toLowerCase().includes(searchText));
+      coinList.innerHTML = "";
+      filteredCoins.forEach(coin => {
+        const li = document.createElement('li');
+        li.textContent = coin.name;
+        li.onclick = () => selectCoin(coin.id);
+        coinList.appendChild(li);
+      });
+    }
+
+    loadCoins();
+  </script>
+</body>
+</html>
